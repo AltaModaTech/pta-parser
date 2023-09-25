@@ -1,6 +1,7 @@
 // Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
 //
-// This project is licensed under   
+// This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+//
 //  Pest's built-in rules:
 //      ASCII_ALPHA_LOWER   = { 'a'..'z' }
 //      ASCII_ALPHA_UPPER   = { 'A'..'Z' }
@@ -50,10 +51,10 @@ posting_basic       = @{
 }
 
 // TODO: improve on 'text' to allow more in description
-trans_description_text = { (ASCII_ALPHANUMERIC | WHITESPACE)+ }
-// TODO: full set of annotation options
+trans_description_text = { (ASCII_ALPHANUMERIC+ | WHITESPACE)+ }
+// TODO: is this the full set of annotation options?
 trans_annotation    = { "*" | "!" }
-trans_description   = { "\"" ~ (ASCII_ALPHANUMERIC+ | WHITESPACE)+ ~ "\"" }
+trans_description   = { "\"" ~ trans_description_text ~ "\"" }
 
 // TODO: how to ensure col 0 / no ws for header row
 trans_header = @{
@@ -103,6 +104,7 @@ balance_directive = @{
     ~ comment_or_newline
 }
 
+// TODO: other directives to implement
 // YYYY-MM-DD pad Account AccountPad
 // YYYY-MM-DD note Account Description
 // YYYY-MM-DD document Account PathToDocument
@@ -111,3 +113,7 @@ balance_directive = @{
 // option Name Value
 // plugin ModuleName StringConfig
 // include Filename
+
+directives = { balance_directive | directive_close | directive_commodity | directive_open }
+
+ledger = { SOI ~ (options | directives | transaction_block)+ ~ EOI }
