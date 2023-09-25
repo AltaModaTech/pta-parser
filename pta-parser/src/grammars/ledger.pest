@@ -1,0 +1,113 @@
+// Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+//
+// This project is licensed under   
+//  Pest's built-in rules:
+//      ASCII_ALPHA_LOWER   = { 'a'..'z' }
+//      ASCII_ALPHA_UPPER   = { 'A'..'Z' }
+//      ASCII_ALPHA         = { ASCII_ALPHA_LOWER | ASCII_ALPHA_UPPER }
+//      ASCII_DIGIT         = { '0'..'9' }
+//      ASCII_ALPHANUMERIC  = { ASCII_ALPHA | ASCII-DIGIT }
+//      
+//      Avoid using WHITE_SPACE which targets [unicode](https://www.unicode.org/reports/tr31/#R3a)
+//
+
+WHITESPACE = _{ " " | "\t" }
+
+// constants
+acct_separator      = { ":" }
+comment_token       = { ";" }
+
+// TODO: need to handle escaped semi-colon?
+// TODO: consider whether comment must be preceded by whitespace (except at beginning of line)
+// a comment
+comment             = { comment_token ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
+comment_or_newline  = { (WHITESPACE+ ~ comment) | (WHITESPACE* ~ NEWLINE) }
+
+// Each acct token must begin with alpha and may be followed by any number of alpha or number
+// Full account descriptors are comprised of colon-separated account names. The top-level 
+//  account name must begin with an alpha char, but subaccounts may begin with alphanumeric.
+top_level_acct      = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
+sub_acct            = @{ acct_separator ~ ASCII_ALPHANUMERIC+ }
+
+// The full acct descriptor must be one or more acct tokens, each separated by a colon
+acct_descriptor     = @{ top_level_acct ~ (sub_acct)* }
+
+decimal_value       = @{ (("-" ~ NUMBER+) | NUMBER+) ~ "." ~ NUMBER+ }
+
+iso8601_year        = { ASCII_DIGIT{4} }
+iso8601_month       = @{ ( "0" ~ ASCII_NONZERO_DIGIT) | ("1" ~ '0'..'2') }
+iso8601_day         = @{ ("30" | "31") | ("0" ~ ASCII_NONZERO_DIGIT) | ('1'..'2' ~ ASCII_DIGIT) }
+iso8601_date_extended = @{ iso8601_year ~ "-" ~ iso8601_month ~ "-" ~ iso8601_day  } // YYYY-MM-DD
+
+
+// TODO: consider more lax indent rules
+posting_indent      = { "\t" | " "{2} }
+posting_basic       = @{
+    posting_indent 
+    ~ acct_descriptor
+    ~ WHITESPACE+ ~ decimal_value
+    ~ comment_or_newline
+}
+
+// TODO: improve on 'text' to allow more in description
+trans_description_text = { (ASCII_ALPHANUMERIC | WHITESPACE)+ }
+// TODO: full set of annotation options
+trans_annotation    = { "*" | "!" }
+trans_description   = { "\"" ~ (ASCII_ALPHANUMERIC+ | WHITESPACE)+ ~ "\"" }
+
+// TODO: how to ensure col 0 / no ws for header row
+trans_header = @{
+    iso8601_date_extended
+    ~ WHITESPACE+
+    ~ trans_annotation
+    ~ WHITESPACE+
+    ~ trans_description
+}
+
+transaction_block   = { trans_header ~ posting_basic+ }
+
+
+currency            = { ASCII_ALPHA_UPPER{3} }
+commodity           = { ASCII_ALPHA+ }  // TODO: should commodity allow numbers?
+options             = { "operating_currency" }
+
+// TODO: open works but is incomplete
+// YYYY-MM-DD open Account [ConstraintCurrency,...] ["BookingMethod"]
+directive_open  = @{
+    iso8601_date_extended
+    ~ WHITESPACE+ ~ "open"
+    ~ WHITESPACE+ ~ acct_descriptor
+    ~ comment_or_newline
+}
+// YYYY-MM-DD close Account
+directive_close = @{
+    iso8601_date_extended
+    ~ WHITESPACE+ ~ "close"
+    ~ WHITESPACE+ ~ acct_descriptor
+    ~ comment_or_newline
+}
+// YYYY-MM-DD commodity Currency
+directive_commodity = @{
+    iso8601_date_extended
+    ~ WHITESPACE+ ~ commodity
+    ~ WHITESPACE+ ~ currency
+    ~ comment_or_newline
+}
+// YYYY-MM-DD balance Account Amount
+balance_directive = @{
+    iso8601_date_extended
+    ~ WHITESPACE+ ~ "balance"
+    ~ WHITESPACE+ ~ acct_descriptor
+    ~ WHITESPACE+ ~ decimal_value
+    ~ WHITESPACE+ ~ currency
+    ~ comment_or_newline
+}
+
+// YYYY-MM-DD pad Account AccountPad
+// YYYY-MM-DD note Account Description
+// YYYY-MM-DD document Account PathToDocument
+// YYYY-MM-DD price Commodity Price
+// YYYY-MM-DD event Name Value
+// option Name Value
+// plugin ModuleName StringConfig
+// include Filename

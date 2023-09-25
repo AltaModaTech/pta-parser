@@ -1,0 +1,15 @@
+[package]
+name = "pta-parser"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+bench = false
+
+[dependencies]
+pest = "2.7.3"
+pest_derive = "2.7.3"
+
+[dev-dependencies]
+rstest = "0.18.2"
