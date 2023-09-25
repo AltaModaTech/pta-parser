@@ -1,6 +1,6 @@
 # pta-parser
 
-A Plain Text Accounting parser built in [Rust](https://www.rust-lang.org/) with [Pest](https://pest.rs/)
+A [Plain Text Accounting](https://plaintextaccounting.org/) parser built in [Rust](https://www.rust-lang.org/) with [Pest](https://pest.rs/)
 
 ## Copyright Notice
 
