@@ -138,7 +138,7 @@ mod parser_tests {
         #[case (Rule::directive_open,  "2001-09-11 open Assets1:cash2:3petty")]
         #[case (Rule::directive_close, "2001-09-11 close assets")]
         #[case (Rule::directive_close, "2001-09-11 close assets1:2cash:3petty")]
-        #[case (Rule::directive_commodity, "2001-09-11 thing USD")]
+        #[case (Rule::directive_commodity, "2001-09-11 commodity USD")]
         #[case (Rule::balance_directive,   "2001-09-11 balance assets 123.456 USD")]
         #[case (Rule::balance_directive,   "2001-09-11 balance assets1:2cash -0.456 USD")]
         fn can_parse_misc_directive(#[case] r: Rule, #[case] base: &str) {
@@ -233,7 +233,8 @@ mod parser_tests {
 
 
         ;; Misc
-        2001-09-11 thing USD ; a comment
+        1792-01-01 commodity USD ; US Dollar
+        2001-09-11 commodity BTC ; Bitcoin launch date
         
         ")]
         fn can_parse_ledger(#[case] year: &str) {

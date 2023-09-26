@@ -91,7 +91,7 @@ directive_close = @{
 // YYYY-MM-DD commodity Currency
 directive_commodity = @{
     iso8601_date_extended
-    ~ WHITESPACE+ ~ commodity
+    ~ WHITESPACE+ ~ "commodity"
     ~ WHITESPACE+ ~ currency
     ~ comment_or_newline
 }
