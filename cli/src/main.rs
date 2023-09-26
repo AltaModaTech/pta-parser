@@ -1,16 +1,54 @@
 extern crate pta_parser;
 
-use pta_parser::LedgerParser;
+// TODO: how to isolate pest so clients can just use lib (w/o requiring pest as here)
+use pest::*;
+use pta_parser::{LedgerParser, Rule};
 
-fn main() {
-    // TODO: implement useful CLI, e.g., 
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // TODO: CLI improvements 
     //  - exec with path of file to parse
     //  - optionally output parse results (should be equivalent to input file)
 
-    println!("\nNOTICE: This CLI is under development...\n");
+    let pb = std::env::current_dir()?;
+    println!("Curr dir: {:?}", pb.as_path());
 
-    // instantiate parser to ensure expected accessibility
-    let _ = LedgerParser {};
+    let p = pb.join("testdata/basic-ledger");
+
+    println!("Reading {:?}", p);
+
+    match std::fs::read_to_string(p) {
+        Ok(ledger) => {
+            println!("Read string length: {}", ledger.len());
+
+            match LedgerParser::parse(Rule::ledger, &ledger) {
+                Ok(pairs) => {
+                    println!("LedgerParser produced {} pairs", pairs.len());
+                    let mut t = pairs.tokens();
+                    while let val = t.next() {
+                        match val {
+                            Some(val) => {
+                                println!("Token: {:?}", val);
+                            }
+
+                            None => { break; }
+                        }
+                    }
+                }
+
+                Err(e) => {
+                    println!("ERR: {}", e);
+                    return Err(Box::new(e));
+                }
+            }
+        }
+
+        Err(e) => {
+            println!("ERR: {}", e);
+            return Err(Box::new(e));
+        }
+    }
+
+    return Ok(());
 }
 
 

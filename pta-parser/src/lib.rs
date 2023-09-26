@@ -10,3 +10,4 @@ extern crate pest_derive;
 
 pub mod ledger_parser;
 pub use ledger_parser::LedgerParser;
+pub use ledger_parser::Rule;

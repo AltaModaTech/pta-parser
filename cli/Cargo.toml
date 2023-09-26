@@ -5,4 +5,5 @@ edition = "2021"
 
 
 [dependencies]
+pest = "2.7.3"
 pta-parser = { path = "../pta-parser" }

@@ -1,0 +1,13 @@
+;; Accounts
+2001-09-11 open Assets
+2001-09-11 open Assets:Cash
+2001-09-12 close Assets
+
+
+;; Balance assertions
+2001-09-11 balance Assets:Cash 123.456 USD
+2001-09-11 balance Liabilities -123.456 USD
+
+
+;; Misc
+2001-09-11 thing USD ; a comment

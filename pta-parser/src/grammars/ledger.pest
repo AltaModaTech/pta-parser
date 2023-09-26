@@ -23,6 +23,7 @@ comment_token       = { ";" }
 // a comment
 comment             = { comment_token ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
 comment_or_newline  = { (WHITESPACE+ ~ comment) | (WHITESPACE* ~ NEWLINE) }
+empty_line          = { WHITESPACE* ~ NEWLINE }
 
 // Each acct token must begin with alpha and may be followed by any number of alpha or number
 // Full account descriptors are comprised of colon-separated account names. The top-level 
@@ -116,4 +117,4 @@ balance_directive = @{
 
 directives = { balance_directive | directive_close | directive_commodity | directive_open }
 
-ledger = { SOI ~ (options | directives | transaction_block)+ ~ EOI }
+ledger = { SOI ~ (options | directives | transaction_block | comment | empty_line)+ ~ EOI }
