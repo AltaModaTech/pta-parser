@@ -16,7 +16,7 @@ WHITESPACE = _{ " " | "\t" }
 
 // constants
 acct_separator      = { ":" }
-comment_token       = { ";" }
+comment_token       = { ";" | "*" }
 
 // TODO: need to handle escaped semi-colon?
 // TODO: consider whether comment must be preceded by whitespace (except at beginning of line)
@@ -70,7 +70,6 @@ transaction_block   = { trans_header ~ posting_basic+ }
 
 
 currency            = { ASCII_ALPHA_UPPER{3} }
-commodity           = { ASCII_ALPHA+ }  // TODO: should commodity allow numbers?
 options             = { "operating_currency" }
 
 // TODO: open works but is incomplete
@@ -106,14 +105,16 @@ balance_directive = @{
 }
 
 // TODO: other directives to implement
-// YYYY-MM-DD pad Account AccountPad
-// YYYY-MM-DD note Account Description
 // YYYY-MM-DD document Account PathToDocument
-// YYYY-MM-DD price Commodity Price
 // YYYY-MM-DD event Name Value
+// YYYY-MM-DD note Account Description
+// YYYY-MM-DD pad Account AccountPad
+// YYYY-MM-DD price Commodity Price
+// include Filename
 // option Name Value
 // plugin ModuleName StringConfig
-// include Filename
+// poptag
+// pushtag
 
 directives = { balance_directive | directive_close | directive_commodity | directive_open }
 

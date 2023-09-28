@@ -223,7 +223,8 @@ mod parser_tests {
 
         #[rstest]
         #[case (
-        ";; Accounts
+        "; an asterisk-based comment
+        * Accounts
         2001-09-11 open assets
         2001-09-11 open assets:cash\t;comment
         2001-09-12 close assets
