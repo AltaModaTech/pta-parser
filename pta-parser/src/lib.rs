@@ -8,6 +8,6 @@ extern crate pest;
 extern crate pest_derive;
 
 
+// Export ledger parser
 pub mod ledger_parser;
-pub use ledger_parser::LedgerParser;
-pub use ledger_parser::Rule;
+pub use ledger_parser::*;

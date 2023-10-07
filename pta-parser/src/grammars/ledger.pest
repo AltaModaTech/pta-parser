@@ -54,7 +54,7 @@ posting_basic       = @{
 // TODO: improve on 'text' to allow more in description
 trans_description_text = { (ASCII_ALPHANUMERIC+ | WHITESPACE)+ }
 // TODO: is this the full set of annotation options?
-trans_annotation    = { "*" | "!" }
+trans_annotation    = { "txn" | "*" | "!" }
 trans_description   = { "\"" ~ trans_description_text ~ "\"" }
 
 // TODO: how to ensure col 0 / no ws for header row
@@ -64,9 +64,10 @@ trans_header = @{
     ~ trans_annotation
     ~ WHITESPACE+
     ~ trans_description
+    ~ comment_or_newline
 }
 
-transaction_block   = { trans_header ~ posting_basic+ }
+transaction_block   = @{ trans_header ~ posting_basic+ }
 
 
 currency            = { ASCII_ALPHA_UPPER{3} }
