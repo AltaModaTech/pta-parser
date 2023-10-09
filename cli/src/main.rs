@@ -52,9 +52,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             Rule::directives => { dump_pair(&pair); }
                             Rule::empty_line => { dump_pair(&pair); }
                             Rule::iso8601_date_extended => { dump_pair(&pair); }
-                            Rule::iso8601_day => { dump_pair(&pair); }
-                            Rule::iso8601_month => { dump_pair(&pair); }
-                            Rule::iso8601_year => { dump_pair(&pair); }
                             Rule::ledger => { dump_pair(&pair); }
                             Rule::options => { dump_pair(&pair); }
                             Rule::posting_basic => { dump_pair(&pair); }

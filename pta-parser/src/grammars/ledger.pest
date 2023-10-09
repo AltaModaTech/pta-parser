@@ -36,10 +36,12 @@ acct_descriptor     = @{ top_level_acct ~ (sub_acct)* }
 
 decimal_value       = @{ (("-" ~ NUMBER+) | NUMBER+) ~ "." ~ NUMBER+ }
 
-iso8601_year        = { ASCII_DIGIT{4} }
-iso8601_month       = @{ ( "0" ~ ASCII_NONZERO_DIGIT) | ("1" ~ '0'..'2') }
-iso8601_day         = @{ ("30" | "31") | ("0" ~ ASCII_NONZERO_DIGIT) | ('1'..'2' ~ ASCII_DIGIT) }
-iso8601_date_extended = @{ iso8601_year ~ "-" ~ iso8601_month ~ "-" ~ iso8601_day  } // YYYY-MM-DD
+
+iso8601_date_extended = @{ 
+    ASCII_DIGIT{4}
+    ~ "-" ~ (( "0" ~ ASCII_NONZERO_DIGIT) | ("1" ~ '0'..'2'))
+    ~ "-" ~ (("30" | "31") | ("0" ~ ASCII_NONZERO_DIGIT) | ('1'..'2' ~ ASCII_DIGIT))
+} // YYYY-MM-DD
 
 
 // TODO: consider more lax indent rules
