@@ -18,11 +18,14 @@
 
 
 * Transactions
-;2009-01-09 ! "Bitcoin launch date"
-;  assets:subacct1    1.0000
-;  equity            -1.0000
+2009-01-09 ! "Bitcoin launch date"
+  assets:subacct1    1.0000
+  equity            -1.0000
 
-;2001-09-12 * "some transaction"
-;  assets        1234.5678
-;  equity       -1234.5678
+2001-09-12 * "some transaction"
+  assets        1234.5678
+  equity       -1234.5678
 
+; Transaction with a single posting - not a valid transaction, but should parse.
+2001-12-31 txn "txn"
+  assets        0.00000000
