@@ -2,28 +2,19 @@
 //
 // This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
 //
-//  Pest's built-in rules:
-//      ASCII_ALPHA_LOWER   = { 'a'..'z' }
-//      ASCII_ALPHA_UPPER   = { 'A'..'Z' }
-//      ASCII_ALPHA         = { ASCII_ALPHA_LOWER | ASCII_ALPHA_UPPER }
-//      ASCII_DIGIT         = { '0'..'9' }
-//      ASCII_ALPHANUMERIC  = { ASCII_ALPHA | ASCII-DIGIT }
-//      
-//      Avoid using WHITE_SPACE which targets [unicode](https://www.unicode.org/reports/tr31/#R3a)
-//
 
 WHITESPACE = _{ " " | "\t" }
 
 // constants
-acct_separator      = { ":" }
-comment_token       = { ";" | "*" }
+acct_separator      = _{ ":" }
+comment_token       = _{ ";" | "*" }
 
 // TODO: need to handle escaped semi-colon?
 // TODO: consider whether comment must be preceded by whitespace (except at beginning of line)
 // a comment
-comment             = { comment_token ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
-comment_or_newline  = { (WHITESPACE+ ~ comment) | (WHITESPACE* ~ NEWLINE) }
-empty_line          = { WHITESPACE* ~ NEWLINE }
+comment             = _{ comment_token ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
+comment_or_newline  = _{ (WHITESPACE+ ~ comment) | (WHITESPACE* ~ NEWLINE) }
+empty_line          = _{ WHITESPACE* ~ NEWLINE }
 
 // Each acct token must begin with alpha and may be followed by any number of alpha or number
 // Full account descriptors are comprised of colon-separated account names. The top-level 
@@ -36,16 +27,21 @@ acct_descriptor     = @{ top_level_acct ~ (sub_acct)* }
 
 decimal_value       = @{ (("-" ~ NUMBER+) | NUMBER+) ~ "." ~ NUMBER+ }
 
-
+// ISO8601 Date Extended format is YYYY-MM-DD where
+//  YYYY is 4 digits; 0000-9999
+//  MM is 2 digits; 01-09, 10-12
+//  DD is 2 digits; 01-09, 10-29, 30, 31
 iso8601_date_extended = @{ 
     ASCII_DIGIT{4}
     ~ "-" ~ (( "0" ~ ASCII_NONZERO_DIGIT) | ("1" ~ '0'..'2'))
     ~ "-" ~ (("30" | "31") | ("0" ~ ASCII_NONZERO_DIGIT) | ('1'..'2' ~ ASCII_DIGIT))
-} // YYYY-MM-DD
+}
 
 
 // TODO: consider more lax indent rules
-posting_indent      = { "\t" | " "{2} }
+// Posting lines of a transaction must begin with 1 tab or 2 spaces
+posting_indent      = _{ "\t" | " "{2} }
+// A basic posting must specify an account and a value, ending with a comment or newline
 posting_basic       = @{
     posting_indent 
     ~ acct_descriptor
@@ -54,12 +50,13 @@ posting_basic       = @{
 }
 
 // TODO: improve on 'text' to allow more in description
-trans_description_text = { (ASCII_ALPHANUMERIC+ | WHITESPACE)+ }
+trans_description_text = _{ (ASCII_ALPHANUMERIC+ | WHITESPACE)+ }
 // TODO: is this the full set of annotation options?
-trans_annotation    = { "txn" | "*" | "!" }
-trans_description   = { "\"" ~ trans_description_text ~ "\"" }
+trans_annotation    = _{ "txn" | "*" | "!" }
+trans_description   = _{ "\"" ~ trans_description_text ~ "\"" }
 
 // TODO: how to ensure col 0 / no ws for header row
+// The header of a transaction specifies the date, an annotation, a description, and ends with a comment or newline
 trans_header = @{
     iso8601_date_extended
     ~ WHITESPACE+
@@ -69,6 +66,8 @@ trans_header = @{
     ~ comment_or_newline
 }
 
+// A transaction begins with a single header followed by one or more postings. Whether the transaction balances is 
+//  outside the scope of parsing.
 transaction_block   = @{ trans_header ~ posting_basic+ }
 
 
@@ -121,4 +120,17 @@ balance_directive = @{
 
 directives = { balance_directive | directive_close | directive_commodity | directive_open }
 
+// The rule for a complete ledger
 ledger = { SOI ~ (options | directives | transaction_block | comment | empty_line)+ ~ EOI }
+
+
+//
+//  Pest's built-in rules:
+//      ASCII_ALPHA_LOWER   = { 'a'..'z' }
+//      ASCII_ALPHA_UPPER   = { 'A'..'Z' }
+//      ASCII_ALPHA         = { ASCII_ALPHA_LOWER | ASCII_ALPHA_UPPER }
+//      ASCII_DIGIT         = { '0'..'9' }
+//      ASCII_ALPHANUMERIC  = { ASCII_ALPHA | ASCII-DIGIT }
+//      
+//      Avoid using WHITE_SPACE which targets [unicode](https://www.unicode.org/reports/tr31/#R3a)
+//

@@ -109,99 +109,103 @@ mod trans_block {
 }
 
 
+//===========
+// NOTE: The tests in trans_header can be used by removing the silent indicator ('_') from the relevant pest rules.
+//  These rules were silenced to simplify processing in code (matching, etc.), but can be un-silenced for debugging, etc.
+//===========
 
-#[cfg(test)]
-mod trans_header {
-    use super::*;
-
-
-    #[rstest]
-    // NOTE: use simple text in case; test function wraps in dbl quotes
-    #[case ("a")]
-    #[case ("description")]
-    #[case (" a description ")]
-    #[case ("\ta description\twith tabs ")]
-    fn can_parse_trans_descr(#[case] descr: &str) {
-
-        let quoted_descr = format!("\"{}\"", descr);
-        let pairs = LedgerParser::parse(
-            Rule::trans_description, &quoted_descr)
-            .unwrap_or_else(|e| panic!("{}", e));
-
-        // Parsing succeeded; ensure at least 1 pair was returned
-        assert!(pairs.len() > 0);
-    }
+// #[cfg(test)]
+// mod trans_header {
+//     use super::*;
 
 
-    #[rstest]
-    // NOTE: use simple text in case; test function wraps in dbl quotes
-    #[case ("")]    // empty - no text
-    #[case ("  ")]  // empty - only ws
-    #[case ("\ta description\twith tabs and\n a newline")]  // newline is invalid
-    #[should_panic(expected = "expected trans_")]
-    fn verify_trans_descr_error(#[case] bad_descr: &str) {
+//     #[rstest]
+//     // NOTE: use simple text in case; test function wraps in dbl quotes
+//     #[case ("a")]
+//     #[case ("description")]
+//     #[case (" a description ")]
+//     #[case ("\ta description\twith tabs ")]
+//     fn can_parse_trans_descr(#[case] descr: &str) {
 
-        let quoted_bad_descr = format!("\"{}\"", bad_descr);
-        LedgerParser::parse(
-            Rule::trans_description, &quoted_bad_descr)
-            .unwrap_or_else(|e| panic!("{}", e));
+//         let quoted_descr = format!("\"{}\"", descr);
+//         let pairs = LedgerParser::parse(
+//             Rule::trans_description, &quoted_descr)
+//             .unwrap_or_else(|e| panic!("{}", e));
 
-        // should never reach this code since all cases should result in panic
-        println!("Test case '{}' should fail to parse!", quoted_bad_descr);
-        assert!(false);
-    }
-
+//         // Parsing succeeded; ensure at least 1 pair was returned
+//         assert!(pairs.len() > 0);
+//     }
 
 
-    #[rstest]
-    // Verify transaction annotations: !, *, txn
-    #[case ("2009-01-09 ! \"Bitcoin launch date\"")]
-    #[case ("2009-01-09 * \"Bitcoin launch date\"")]
-    #[case ("2009-01-09 txn \"Bitcoin launch date\"")]
-    // whitespace variations
-    #[case ("2010-01-09  *  \"multi whitespace test\"")]
-    #[case ("2011-01-09\t!\t\"tab test\"")]
-    #[case ("2011-01-09\ttxn\t\"tab test\"")]
-    #[case ("2012-01-09 * \"trailing tab test\"\t")]
-    #[case ("2013-01-09 ! \"trailing spaces test\"  ")]
-    #[case ("2014-01-09 ! \"trailing tabs and spaces test\" \t \t\t  ")]
-    // #[ignore = "TBD: handle special chars in transaction description"]
-    // #[case ("2009-01-09 ! \"Special chars in description: !@#$%^&*()-_=+\"")]
-    fn can_parse_trans_header(#[case] base: &str) {
+//     #[rstest]
+//     // NOTE: use simple text in case; test function wraps in dbl quotes
+//     #[case ("")]    // empty - no text
+//     #[case ("  ")]  // empty - only ws
+//     #[case ("\ta description\twith tabs and\n a newline")]  // newline is invalid
+//     #[should_panic(expected = "expected trans_")]
+//     fn verify_trans_descr_error(#[case] bad_descr: &str) {
 
-        // NOTE: addons must end in \n to match rules
-        let addons = [
-            "\n"
-            ," \n"
-            ,"\t\n"
-            ," ; comment 123 ; \n"
-            ,"\t;\tcomment 123 ;\t\n"
-        ];
+//         let quoted_bad_descr = format!("\"{}\"", bad_descr);
+//         LedgerParser::parse(
+//             Rule::trans_description, &quoted_bad_descr)
+//             .unwrap_or_else(|e| panic!("{}", e));
 
-        for suffix in addons.iter() {
+//         // should never reach this code since all cases should result in panic
+//         println!("Test case '{}' should fail to parse!", quoted_bad_descr);
+//         assert!(false);
+//     }
 
-            let tc = format!("{}{}", base, suffix);
-            println!("Test case: {}", tc);
 
-            assert!(get_pairs(Rule::trans_header, &tc).len() > 0);
-        }
+
+//     #[rstest]
+//     // Verify transaction annotations: !, *, txn
+//     #[case ("2009-01-09 ! \"Bitcoin launch date\"")]
+//     #[case ("2009-01-09 * \"Bitcoin launch date\"")]
+//     #[case ("2009-01-09 txn \"Bitcoin launch date\"")]
+//     // whitespace variations
+//     #[case ("2010-01-09  *  \"multi whitespace test\"")]
+//     #[case ("2011-01-09\t!\t\"tab test\"")]
+//     #[case ("2011-01-09\ttxn\t\"tab test\"")]
+//     #[case ("2012-01-09 * \"trailing tab test\"\t")]
+//     #[case ("2013-01-09 ! \"trailing spaces test\"  ")]
+//     #[case ("2014-01-09 ! \"trailing tabs and spaces test\" \t \t\t  ")]
+//     // #[ignore = "TBD: handle special chars in transaction description"]
+//     // #[case ("2009-01-09 ! \"Special chars in description: !@#$%^&*()-_=+\"")]
+//     fn can_parse_trans_header(#[case] base: &str) {
+
+//         // NOTE: addons must end in \n to match rules
+//         let addons = [
+//             "\n"
+//             ," \n"
+//             ,"\t\n"
+//             ," ; comment 123 ; \n"
+//             ,"\t;\tcomment 123 ;\t\n"
+//         ];
+
+//         for suffix in addons.iter() {
+
+//             let tc = format!("{}{}", base, suffix);
+//             println!("Test case: {}", tc);
+
+//             assert!(get_pairs(Rule::trans_header, &tc).len() > 0);
+//         }
         
-    }
+//     }
 
-    #[rstest]
-    #[case ("2016-01-28 * \"comment after description w/o whitespace\"; 10:01 am, xfer id 56aa57787199a73d29000650\n")]
-    #[should_panic(expected = "expected trans_header")]
-    fn verify_trans_header_error(#[case] bad_hdr: &str) {
+//     #[rstest]
+//     #[case ("2016-01-28 * \"comment after description w/o whitespace\"; 10:01 am, xfer id 56aa57787199a73d29000650\n")]
+//     #[should_panic(expected = "expected trans_header")]
+//     fn verify_trans_header_error(#[case] bad_hdr: &str) {
 
-        let quoted_bad_descr = format!("\"{}\"", bad_hdr);
-        LedgerParser::parse(
-            Rule::trans_header, &quoted_bad_descr)
-            .unwrap_or_else(|e| panic!("{}", e));
+//         let quoted_bad_descr = format!("\"{}\"", bad_hdr);
+//         LedgerParser::parse(
+//             Rule::trans_header, &quoted_bad_descr)
+//             .unwrap_or_else(|e| panic!("{}", e));
 
-        // should never reach this code since all cases should result in panic
-        println!("Test case '{}' should fail to parse!", quoted_bad_descr);
-        assert!(false);
-    }
+//         // should never reach this code since all cases should result in panic
+//         println!("Test case '{}' should fail to parse!", quoted_bad_descr);
+//         assert!(false);
+//     }
 
 
-}
+// }
