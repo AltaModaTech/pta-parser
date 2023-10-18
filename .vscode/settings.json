@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "./pta-parser/Cargo.toml"
+    ]
+}
