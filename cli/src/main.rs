@@ -19,9 +19,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     match std::fs::read_to_string(p) {
         Ok(ledger) => {
             println!("Read string length: {}", ledger.len());
-
-            // return main_consume(&ledger);
-
             return main_parse(&ledger);
         }
 
@@ -34,25 +31,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 
-#[allow(dead_code)]
-fn main_consume(ledger: &String) -> Result<(), Box<dyn std::error::Error>> {
 
-    match LedgerParser::parse(Rule::ledger, &ledger) {
-        Ok(root) => {
-            return Ok(());
-        }
-
-        Err(e) => {
-            println!("ERR: {}", e);
-            return Err(Box::new(e));
-        }        
-    }
-    // return Ok(());
-
-}
-
-
-#[allow(dead_code)]
+#[allow(dead_code)] // allows switching b/t mains in primary main above
 fn main_parse(ledger: &String) -> Result<(), Box<dyn std::error::Error>> {
 
     match LedgerParser::parse(Rule::ledger, &ledger) {
