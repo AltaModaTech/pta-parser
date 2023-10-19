@@ -1,5 +1,5 @@
 [package]
-name = "pta-parser"
+name = "pta-types"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,7 +11,6 @@ bench = false
 log = "0.4.20"
 pest = "2.7.3"
 pest_derive = "2.7.3"
-pta-types = { path = "../pta-types" }
 
 [dev-dependencies]
 rstest = "0.18.2"

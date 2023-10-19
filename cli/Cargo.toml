@@ -5,5 +5,8 @@ edition = "2021"
 
 
 [dependencies]
+log = "0.4.20"
 pest = "2.7.3"
+pta-ledger = { path = "../pta-ledger" }
 pta-parser = { path = "../pta-parser" }
+pta-types = { path = "../pta-types" }

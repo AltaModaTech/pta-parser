@@ -1,5 +1,5 @@
 [package]
-name = "pta-parser"
+name = "pta-ledger"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,10 +8,12 @@ edition = "2021"
 bench = false
 
 [dependencies]
-log = "0.4.20"
+log = { version = "0.4.20", features = ["kv_unstable", "kv_unstable_serde"] }
 pest = "2.7.3"
 pest_derive = "2.7.3"
-pta-types = { path = "../pta-types" }
+pretty_env_logger = "0.5.0"
+pta-parser = { path = "../pta-parser" }
+pta-types ={ path = "../pta-types" }
 
 [dev-dependencies]
 rstest = "0.18.2"
