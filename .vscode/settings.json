@@ -1,5 +1,8 @@
 {
     "rust-analyzer.linkedProjects": [
-        "./pta-parser/Cargo.toml"
+        "./cli/Cargo.toml",
+        "./pta-ledger/Cargo.toml",
+        "./pta-parser/Cargo.toml",
+        "./pta-types/Cargo.toml"
     ]
 }

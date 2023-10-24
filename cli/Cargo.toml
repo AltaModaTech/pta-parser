@@ -7,6 +7,7 @@ edition = "2021"
 [dependencies]
 log = "0.4.20"
 pest = "2.7.3"
+pretty_env_logger = "0.5.0"
 pta-ledger = { path = "../pta-ledger" }
 pta-parser = { path = "../pta-parser" }
 pta-types = { path = "../pta-types" }
