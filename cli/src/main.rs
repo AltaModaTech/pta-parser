@@ -5,10 +5,7 @@ extern crate pta_parser;
 use log::{info, warn, as_error, error};
 
 // TODO: how to isolate pest so clients can just use lib (w/o requiring pest as here)
-use pest::{*, iterators::Pair};
 use pta_ledger::ledger_builder::LedgerBuilder;
-use pta_parser::{LedgerParser, Rule};
-use pta_types::{FilePosition, RawTransaction, ParserInfo };
 
 
 
@@ -30,7 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(ledger) => {
             info!("String length from input: {}", ledger.len());
             match bldr.from_string(&ledger) {
-                Ok(parsed) => {
+                Ok(_parsed) => {
                     info!("Successfully parsed into ParsedLedger");
                     return Ok(());
                 },

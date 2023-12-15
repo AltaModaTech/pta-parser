@@ -1,4 +1,3 @@
-use std::error::Error;
 
 use log::{info, warn, as_error};
 
@@ -41,7 +40,6 @@ impl LedgerBuilder {
 
 
     fn handle_pair(self: &Self, pair: Pair<'_, Rule>) -> Result<(), Box<dyn std::error::Error>> {
-        let parsed = ParsedLedger::default();
 
         match pair.as_rule() {
             Rule::comment => {
@@ -127,13 +125,13 @@ fn handle_ledger_rule(pair: & Pair<Rule>) -> Result<(), Box<dyn std::error::Erro
     return Ok(());
 }
 
-
-fn handle_posting_basic(xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
+#[allow(dead_code)]  // TODO: REMOVE allow dead code
+fn handle_posting_basic(_xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
 
     match LedgerParser::parse(Rule::posting_basic, pair.as_span().as_str()) {
-        Ok(posting) => {
+        Ok(_posting) => {
             info!("handling posting_basic");
-            // handle_posting_basic(xn, posting);
+            // handle_posting_basic(xn, posting);  TODO: fix
         }
         
         Err(e) => {
@@ -146,7 +144,7 @@ fn handle_posting_basic(xn: &mut raw_transaction::RawTransaction, pair: &Pair<Ru
     return Ok(());
 }
 
-fn handle_trans_header(xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
+fn handle_trans_header(_: &mut raw_transaction::RawTransaction, _: &Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
     info!("handling trans_header...");
 
     return Ok(());
@@ -167,7 +165,16 @@ fn handle_trans_block(xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule
         Ok(hdr) => {
             for pair in hdr.into_iter() {
                 info!("attempt handle_trans_header on {}", pair.as_span().as_str());
-                handle_trans_header(xn, &pair);
+                match handle_trans_header(xn, &pair) {
+                    Ok(()) => {
+                        // TODO: REVIEW: should anything happen here?
+                    }
+
+                    Err(e) => {
+                        warn!(err = e; "handle_trans_header failed");
+                        return Err(e);
+                    }
+                }
 
             }
             // for p in &pair.into_inner() {
