@@ -7,7 +7,7 @@ use pta_types::*;
 
 // TODO: how to isolate pest so clients can just use lib (w/o requiring pest as here)
 use pest::{*, iterators::Pair};
-use pta_parser::{LedgerParser, Rule};
+use pta_parser::{GenericParser, Rule};
 
 
 #[derive(Default)]
@@ -20,7 +20,7 @@ impl LedgerBuilder {
 
         self.pl = ParsedLedger::default();
 
-        match LedgerParser::parse(Rule::ledger, &ledger) {
+        match GenericParser::parse(Rule::ledger, &ledger) {
             Ok(root) => {
                 info!("Successfully parsed with Rule::ledger");
                 for pair in root.into_iter() {
@@ -128,7 +128,7 @@ fn handle_ledger_rule(pair: & Pair<Rule>) -> Result<(), Box<dyn std::error::Erro
 #[allow(dead_code)]  // TODO: REMOVE allow dead code
 fn handle_posting_basic(_xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
 
-    match LedgerParser::parse(Rule::posting_basic, pair.as_span().as_str()) {
+    match GenericParser::parse(Rule::posting_basic, pair.as_span().as_str()) {
         Ok(_posting) => {
             info!("handling posting_basic");
             // handle_posting_basic(xn, posting);  TODO: fix
@@ -161,7 +161,7 @@ fn handle_trans_block(xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule
     };
 
     info!("parse with trans_header");
-    match LedgerParser::parse(Rule::trans_header, &pair.as_span().as_str()) {
+    match GenericParser::parse(Rule::trans_header, &pair.as_span().as_str()) {
         Ok(hdr) => {
             for pair in hdr.into_iter() {
                 info!("attempt handle_trans_header on {}", pair.as_span().as_str());

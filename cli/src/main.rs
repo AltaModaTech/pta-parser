@@ -52,11 +52,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod cli_tests {
 
-    use pta_parser::LedgerParser;
+    use pta_parser::GenericParser;
 
     #[test]
     fn can_create_parser() {
         // simply verifies that the parser can be instantiated, ensuring accessibility
-        let _ = LedgerParser{};
+        let _ = GenericParser{};
     }
 }

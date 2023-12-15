@@ -71,7 +71,7 @@ mod ledger_file {
     ")]
     fn can_parse_ledger(#[case] year: &str) {
 
-        let pairs = LedgerParser::parse(
+        let pairs = GenericParser::parse(
             Rule::ledger, year)
             .unwrap_or_else(|e| panic!("{}", e));
 
@@ -85,7 +85,7 @@ mod ledger_file {
 
 
 pub fn get_pairs(r: Rule, content: &str) -> Pairs<'_, Rule> {
-    let x = LedgerParser::parse(
+    let x = GenericParser::parse(
         r,
         
             content)

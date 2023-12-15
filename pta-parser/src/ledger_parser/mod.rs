@@ -8,7 +8,8 @@
 use pest_derive::*;
 
 #[derive(Parser)]
-#[grammar = "./grammars/ledger.pest"]
-pub struct LedgerParser;
+#[grammar = "./grammars/base.pest"]
+#[grammar = "./grammars/generic.pest"]
+pub struct GenericParser;
 
 

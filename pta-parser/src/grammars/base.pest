@@ -1,0 +1,44 @@
+// Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+//
+// This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+//
+
+WHITESPACE = _{ " " | "\t" }
+
+// constants
+acct_separator      = _{ ":" }
+comment_token       = _{ ";" | "*" }
+
+// TODO: need to handle escaped semi-colon?
+// TODO: consider whether comment must be preceded by whitespace (except at beginning of line)
+// a comment
+comment             = _{ comment_token ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
+comment_or_newline  = _{ (WHITESPACE+ ~ comment) | (WHITESPACE* ~ NEWLINE) }
+empty_line          = _{ WHITESPACE* ~ NEWLINE }
+
+
+// ISO8601 Date Extended format is YYYY-MM-DD where
+//  YYYY is 4 digits; 0000-9999
+//  MM is 2 digits; 01-09, 10-12
+//  DD is 2 digits; 01-09, 10-29, 30, 31
+iso8601_date_extended = @{ 
+    ASCII_DIGIT{4}
+    ~ "-" ~ (( "0" ~ ASCII_NONZERO_DIGIT) | ("1" ~ '0'..'2'))
+    ~ "-" ~ (("30" | "31") | ("0" ~ ASCII_NONZERO_DIGIT) | ('1'..'2' ~ ASCII_DIGIT))
+}
+
+
+currency            = { ASCII_ALPHA_UPPER{3} }
+
+
+
+//
+//  Pest's built-in rules:
+//      ASCII_ALPHA_LOWER   = { 'a'..'z' }
+//      ASCII_ALPHA_UPPER   = { 'A'..'Z' }
+//      ASCII_ALPHA         = { ASCII_ALPHA_LOWER | ASCII_ALPHA_UPPER }
+//      ASCII_DIGIT         = { '0'..'9' }
+//      ASCII_ALPHANUMERIC  = { ASCII_ALPHA | ASCII-DIGIT }
+//      
+//      Avoid using WHITE_SPACE which targets [unicode](https://www.unicode.org/reports/tr31/#R3a)
+//

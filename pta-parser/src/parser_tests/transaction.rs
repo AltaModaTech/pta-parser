@@ -39,7 +39,7 @@ mod posting {
     #[should_panic(expected = "expected posting_basic")] // matches errors from multiple iso8601 rules
     fn verify_posting_basic_error(#[case] bad_date: &str) {
 
-        LedgerParser::parse(
+        GenericParser::parse(
             Rule::posting_basic, bad_date)
             .unwrap_or_else(|e| panic!("{}", e));
 
@@ -68,7 +68,7 @@ mod trans_block {
     #[case ("2009-01-09 ! \"Bitcoin launch date\"\n\tassets    1.0000\n  equity    -1.0000\n")]
     fn can_parse_trans_block(#[case] tblock: &str) {
 
-        let pairs = LedgerParser::parse(
+        let pairs = GenericParser::parse(
             Rule::transaction_block, &tblock)
             .unwrap_or_else(|e| panic!("{}", e));
 
@@ -82,7 +82,7 @@ mod trans_block {
     ")]
     #[should_panic(expected = "expected transaction_block")]
     fn verify_trans_block_posting_error(#[case] bad_block: &str) {
-        LedgerParser::parse(
+        GenericParser::parse(
             Rule::transaction_block, &bad_block)
             .unwrap_or_else(|e| panic!("{}", e));
 
@@ -97,7 +97,7 @@ mod trans_block {
     #[case ("2009-01-09 ! \"Bitcoin launch date\"")]
     #[should_panic(expected = "expected trans_header")]
     fn verify_trans_block_trans_header_error(#[case] bad_block: &str) {
-        LedgerParser::parse(
+        GenericParser::parse(
             Rule::transaction_block, &bad_block)
             .unwrap_or_else(|e| panic!("{}", e));
 
@@ -128,7 +128,7 @@ mod trans_block {
 //     fn can_parse_trans_descr(#[case] descr: &str) {
 
 //         let quoted_descr = format!("\"{}\"", descr);
-//         let pairs = LedgerParser::parse(
+//         let pairs = GenericParser::parse(
 //             Rule::trans_description, &quoted_descr)
 //             .unwrap_or_else(|e| panic!("{}", e));
 
@@ -146,7 +146,7 @@ mod trans_block {
 //     fn verify_trans_descr_error(#[case] bad_descr: &str) {
 
 //         let quoted_bad_descr = format!("\"{}\"", bad_descr);
-//         LedgerParser::parse(
+//         GenericParser::parse(
 //             Rule::trans_description, &quoted_bad_descr)
 //             .unwrap_or_else(|e| panic!("{}", e));
 
@@ -198,7 +198,7 @@ mod trans_block {
 //     fn verify_trans_header_error(#[case] bad_hdr: &str) {
 
 //         let quoted_bad_descr = format!("\"{}\"", bad_hdr);
-//         LedgerParser::parse(
+//         GenericParser::parse(
 //             Rule::trans_header, &quoted_bad_descr)
 //             .unwrap_or_else(|e| panic!("{}", e));
 
