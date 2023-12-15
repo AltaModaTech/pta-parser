@@ -3,39 +3,18 @@
 // This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
 //
 
-WHITESPACE = _{ " " | "\t" }
-
-// constants
-acct_separator      = _{ ":" }
-comment_token       = _{ ";" | "*" }
-
-// TODO: need to handle escaped semi-colon?
-// TODO: consider whether comment must be preceded by whitespace (except at beginning of line)
-// a comment
-comment             = _{ comment_token ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
-comment_or_newline  = _{ (WHITESPACE+ ~ comment) | (WHITESPACE* ~ NEWLINE) }
-empty_line          = _{ WHITESPACE* ~ NEWLINE }
 
 // Each acct token must begin with alpha and may be followed by any number of alpha or number
 // Full account descriptors are comprised of colon-separated account names. The top-level 
 //  account name must begin with an alpha char, but subaccounts may begin with alphanumeric.
-top_level_acct      = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
-sub_acct            = @{ acct_separator ~ ASCII_ALPHANUMERIC+ }
+// BEANCOUNT diffs: requires account names to being with upper case alpha
+top_level_acct      = @{ ASCII_ALPHA_UPPER ~ ASCII_ALPHANUMERIC* }
+sub_acct            = @{ acct_separator ~ ASCII_ALPHA_UPPER ~ ASCII_ALPHANUMERIC+ }
 
 // The full acct descriptor must be one or more acct tokens, each separated by a colon
 acct_descriptor     = @{ top_level_acct ~ (sub_acct)* }
 
 decimal_value       = @{ (("-" ~ NUMBER+) | NUMBER+) ~ "." ~ NUMBER+ }
-
-// ISO8601 Date Extended format is YYYY-MM-DD where
-//  YYYY is 4 digits; 0000-9999
-//  MM is 2 digits; 01-09, 10-12
-//  DD is 2 digits; 01-09, 10-29, 30, 31
-iso8601_date_extended = @{ 
-    ASCII_DIGIT{4}
-    ~ "-" ~ (( "0" ~ ASCII_NONZERO_DIGIT) | ("1" ~ '0'..'2'))
-    ~ "-" ~ (("30" | "31") | ("0" ~ ASCII_NONZERO_DIGIT) | ('1'..'2' ~ ASCII_DIGIT))
-}
 
 
 // TODO: consider more lax indent rules
@@ -71,7 +50,6 @@ trans_header = @{
 transaction_block   = @{ trans_header ~ posting_basic+ }
 
 
-currency            = { ASCII_ALPHA_UPPER{3} }
 options             = { "operating_currency" }
 
 // TODO: open works but is incomplete
@@ -121,7 +99,7 @@ balance_directive = @{
 directives = { balance_directive | directive_close | directive_commodity | directive_open }
 
 // The rule for a complete ledger
-ledger = { SOI ~ (options | directives | transaction_block | comment | empty_line)+ ~ EOI }
+beancount_ledger = { SOI ~ (options | directives | transaction_block | comment | empty_line)+ ~ EOI }
 
 
 //

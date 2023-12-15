@@ -1,7 +1,13 @@
+# Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+#
+# This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+
 [package]
 name = "cli"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+authors.workspace = true
+respository.workspace = true
+edition.workspace = true
 
 
 [dependencies]

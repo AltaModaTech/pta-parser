@@ -1,3 +1,8 @@
+// Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+//
+// This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+//
+
 extern crate pta_ledger;
 extern crate pta_parser;
 
@@ -52,11 +57,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod cli_tests {
 
-    use pta_parser::GenericParser;
+    use pta_parser::parsers::generic::Parser;
 
     #[test]
     fn can_create_parser() {
         // simply verifies that the parser can be instantiated, ensuring accessibility
-        let _ = GenericParser{};
+        let _ = Parser{};
     }
 }

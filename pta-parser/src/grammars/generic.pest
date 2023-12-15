@@ -98,7 +98,7 @@ balance_directive = @{
 directives = { balance_directive | directive_close | directive_commodity | directive_open }
 
 // The rule for a complete ledger
-ledger = { SOI ~ (options | directives | transaction_block | comment | empty_line)+ ~ EOI }
+generic_ledger = { SOI ~ (options | directives | transaction_block | comment | empty_line)+ ~ EOI }
 
 
 //

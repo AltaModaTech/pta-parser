@@ -1,3 +1,8 @@
+// Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+//
+// This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+//
+
 #[derive(Default, Clone)]
 pub struct FilePosition {
     pub line: usize,

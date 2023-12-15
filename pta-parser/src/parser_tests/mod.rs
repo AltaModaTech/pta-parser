@@ -1,9 +1,15 @@
+// Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+//
+// This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+//
+
 
 pub use super::*;
 pub use pest::{Parser, iterators::Pairs};
 #[cfg(test)] 
 pub use rstest::rstest;
 
+use super::parsers::*;
 
 mod basics;
 mod transaction;
@@ -16,15 +22,15 @@ mod directives {
     // YYYY-MM-DD open Account [ConstraintCurrency,...] ["BookingMethod"]
 
     #[rstest]
-    #[case (Rule::directive_open,  "2001-09-11 open assets")]
-    #[case (Rule::directive_open,  "2001-09-11 open assets:cash")]
-    #[case (Rule::directive_open,  "2001-09-11 open Assets1:cash2:3petty")]
-    #[case (Rule::directive_close, "2001-09-11 close assets")]
-    #[case (Rule::directive_close, "2001-09-11 close assets1:2cash:3petty")]
-    #[case (Rule::directive_commodity, "2001-09-11 commodity USD")]
-    #[case (Rule::balance_directive,   "2001-09-11 balance assets 123.456 USD")]
-    #[case (Rule::balance_directive,   "2001-09-11 balance assets1:2cash -0.456 USD")]
-    fn can_parse_misc_directive(#[case] r: Rule, #[case] base: &str) {
+    #[case (generic::Rule::directive_open,  "2001-09-11 open assets")]
+    #[case (generic::Rule::directive_open,  "2001-09-11 open assets:cash")]
+    #[case (generic::Rule::directive_open,  "2001-09-11 open Assets1:cash2:3petty")]
+    #[case (generic::Rule::directive_close, "2001-09-11 close assets")]
+    #[case (generic::Rule::directive_close, "2001-09-11 close assets1:2cash:3petty")]
+    #[case (generic::Rule::directive_commodity, "2001-09-11 commodity USD")]
+    #[case (generic::Rule::balance_directive,   "2001-09-11 balance assets 123.456 USD")]
+    #[case (generic::Rule::balance_directive,   "2001-09-11 balance assets1:2cash -0.456 USD")]
+    fn can_parse_misc_directive(#[case] r: generic::Rule, #[case] base: &str) {
 
         // NOTE: addons must end in \n to match rules
         let addons = [
@@ -71,8 +77,8 @@ mod ledger_file {
     ")]
     fn can_parse_ledger(#[case] year: &str) {
 
-        let pairs = GenericParser::parse(
-            Rule::ledger, year)
+        let pairs = generic::Parser::parse(
+            generic::Rule::generic_ledger, year)
             .unwrap_or_else(|e| panic!("{}", e));
 
         // Parsing succeeded; ensure at least 1 pair was returned
@@ -84,8 +90,8 @@ mod ledger_file {
 
 
 
-pub fn get_pairs(r: Rule, content: &str) -> Pairs<'_, Rule> {
-    let x = GenericParser::parse(
+pub fn get_pairs(r: generic::Rule, content: &str) -> Pairs<'_, generic::Rule> {
+    let x = generic::Parser::parse(
         r,
         
             content)

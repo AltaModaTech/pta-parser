@@ -1,3 +1,8 @@
+// Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+//
+// This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+//
+
 
 use log::{info, warn, as_error};
 
@@ -7,8 +12,7 @@ use pta_types::*;
 
 // TODO: how to isolate pest so clients can just use lib (w/o requiring pest as here)
 use pest::{*, iterators::Pair};
-use pta_parser::{GenericParser, Rule};
-
+use pta_parser::parsers::generic;
 
 #[derive(Default)]
 pub struct LedgerBuilder {
@@ -20,9 +24,9 @@ impl LedgerBuilder {
 
         self.pl = ParsedLedger::default();
 
-        match GenericParser::parse(Rule::ledger, &ledger) {
+        match generic::Parser::parse(generic::Rule::generic_ledger, &ledger) {
             Ok(root) => {
-                info!("Successfully parsed with Rule::ledger");
+                info!("Successfully parsed with generic::Rule::generic_ledger");
                 for pair in root.into_iter() {
                     info!("LedgerBuilder::from_string: root pair is {:}", pair.as_str());
                     self.handle_pair(pair)?;
@@ -30,7 +34,7 @@ impl LedgerBuilder {
             }
     
             Err(err) => {
-                warn!(err = as_error!(err); "failed to parse with Rule::ledger");
+                warn!(err = as_error!(err); "failed to parse with generic::Rule::generic_ledger");
                 return Err(Box::new(err));
             }
         }
@@ -39,48 +43,48 @@ impl LedgerBuilder {
     }
 
 
-    fn handle_pair(self: &Self, pair: Pair<'_, Rule>) -> Result<(), Box<dyn std::error::Error>> {
+    fn handle_pair(self: &Self, pair: Pair<'_, generic::Rule>) -> Result<(), Box<dyn std::error::Error>> {
 
         match pair.as_rule() {
-            Rule::comment => {
-                info!("Rule::comment: {:?}", pair.as_span().as_str());
+            generic::Rule::comment => {
+                info!("generic::Rule::comment: {:?}", pair.as_span().as_str());
             }
-            Rule::EOI => { 
-                info!("Rule::EOI at {:?}", pair.line_col());
+            generic::Rule::EOI => { 
+                info!("generic::Rule::EOI at {:?}", pair.line_col());
             }
     
-            Rule::WHITESPACE => {}
-            Rule::acct_descriptor => { dump_pair(&pair); return Ok(()); }
-            Rule::acct_separator => { dump_pair(&pair); return Ok(()); }
-            Rule::balance_directive => { dump_pair(&pair); return Ok(()); }
-            Rule::comment_or_newline => { dump_pair(&pair); return Ok(()); }
-            Rule::comment_token => { dump_pair(&pair); return Ok(()); }
-            Rule::currency => { dump_pair(&pair); return Ok(()); }
-            Rule::decimal_value => { dump_pair(&pair); return Ok(()); }
-            Rule::directive_close => { dump_pair(&pair); return Ok(()); }
-            Rule::directive_commodity => { dump_pair(&pair); return Ok(()); }
-            Rule::directive_open => { dump_pair(&pair); return Ok(()); }
-            Rule::directives => { dump_pair(&pair); return Ok(()); }
-            Rule::empty_line => {}
-            Rule::iso8601_date_extended => { dump_pair(&pair); return Ok(()); }
-            Rule::ledger => { 
+            generic::Rule::WHITESPACE => {}
+            generic::Rule::acct_descriptor => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::acct_separator => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::balance_directive => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::comment_or_newline => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::comment_token => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::currency => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::decimal_value => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::directive_close => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::directive_commodity => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::directive_open => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::directives => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::empty_line => {}
+            generic::Rule::iso8601_date_extended => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::generic_ledger => { 
                 return handle_ledger_rule(&pair);
             }
-            Rule::options => { dump_pair(&pair); return Ok(()); }
-            Rule::posting_basic => { 
+            generic::Rule::options => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::posting_basic => { 
                 dump_pair(&pair); return Ok(());
             }
-            Rule::posting_indent => { dump_pair(&pair); return Ok(()); }
-            Rule::sub_acct => { dump_pair(&pair); return Ok(()); }
-            Rule::top_level_acct => { dump_pair(&pair); return Ok(()); }
-            Rule::trans_annotation => { dump_pair(&pair); return Ok(()); }
-            Rule::trans_description => { dump_pair(&pair); return Ok(()); }
-            Rule::trans_description_text => { dump_pair(&pair); return Ok(()); }
-            Rule::trans_header => {
+            generic::Rule::posting_indent => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::sub_acct => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::top_level_acct => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::trans_annotation => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::trans_description => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::trans_description_text => { dump_pair(&pair); return Ok(()); }
+            generic::Rule::trans_header => {
                 let mut xn = raw_transaction::RawTransaction::default();
                 return handle_trans_header(&mut xn, &pair);
             }
-            Rule::transaction_block => {
+            generic::Rule::transaction_block => {
                 let mut xn = raw_transaction::RawTransaction::default();
                 return handle_trans_block(&mut xn, &pair);
             }
@@ -93,23 +97,23 @@ impl LedgerBuilder {
 }
 
 
-fn dump_rule_of_pair(p: &Pair<Rule>) {
+fn dump_rule_of_pair(p: &Pair<generic::Rule>) {
     info!("RULE: {:?} at {:?}; SPAN: {:?}", &p.as_rule(), &p.line_col(), &p.as_span());
 }
 
 // REMOVE:
 #[allow(dead_code)]
-fn dump_rule(r:&Rule, s:&Span) {
+fn dump_rule(r:&generic::Rule, s:&Span) {
     info!("RULE: {:?}; SPAN: {:?}", &r, &s);
 }
 
-fn dump_pair(p:&Pair<Rule>) {
+fn dump_pair(p:&Pair<generic::Rule>) {
     dump_rule_of_pair(p);
 }
 
 
 
-fn handle_ledger_rule(pair: & Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
+fn handle_ledger_rule(pair: & Pair<generic::Rule>) -> Result<(), Box<dyn std::error::Error>> {
     for inner_pair in pair.clone().into_inner() {
 
         match handle_pair(inner_pair) {
@@ -126,9 +130,9 @@ fn handle_ledger_rule(pair: & Pair<Rule>) -> Result<(), Box<dyn std::error::Erro
 }
 
 #[allow(dead_code)]  // TODO: REMOVE allow dead code
-fn handle_posting_basic(_xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
+fn handle_posting_basic(_xn: &mut raw_transaction::RawTransaction, pair: &Pair<generic::Rule>) -> Result<(), Box<dyn std::error::Error>> {
 
-    match GenericParser::parse(Rule::posting_basic, pair.as_span().as_str()) {
+    match generic::Parser::parse(generic::Rule::posting_basic, pair.as_span().as_str()) {
         Ok(_posting) => {
             info!("handling posting_basic");
             // handle_posting_basic(xn, posting);  TODO: fix
@@ -144,13 +148,13 @@ fn handle_posting_basic(_xn: &mut raw_transaction::RawTransaction, pair: &Pair<R
     return Ok(());
 }
 
-fn handle_trans_header(_: &mut raw_transaction::RawTransaction, _: &Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
+fn handle_trans_header(_: &mut raw_transaction::RawTransaction, _: &Pair<generic::Rule>) -> Result<(), Box<dyn std::error::Error>> {
     info!("handling trans_header...");
 
     return Ok(());
 }
 
-fn handle_trans_block(xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule>) -> Result<(), Box<dyn std::error::Error>> {
+fn handle_trans_block(xn: &mut raw_transaction::RawTransaction, pair: &Pair<generic::Rule>) -> Result<(), Box<dyn std::error::Error>> {
     info!("handling trans_block...");
 
     xn.pinfo = ParserInfo {
@@ -161,7 +165,7 @@ fn handle_trans_block(xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule
     };
 
     info!("parse with trans_header");
-    match GenericParser::parse(Rule::trans_header, &pair.as_span().as_str()) {
+    match generic::Parser::parse(generic::Rule::trans_header, &pair.as_span().as_str()) {
         Ok(hdr) => {
             for pair in hdr.into_iter() {
                 info!("attempt handle_trans_header on {}", pair.as_span().as_str());
@@ -195,45 +199,45 @@ fn handle_trans_block(xn: &mut raw_transaction::RawTransaction, pair: &Pair<Rule
 
 
 
-fn handle_pair(pair: Pair<'_, Rule>) -> Result<(), Box<dyn std::error::Error>> {
+fn handle_pair(pair: Pair<'_, generic::Rule>) -> Result<(), Box<dyn std::error::Error>> {
     match pair.as_rule() {
-        Rule::comment => {
-            info!("Rule::comment: {:?}", pair.as_span().as_str());
+        generic::Rule::comment => {
+            info!("generic::Rule::comment: {:?}", pair.as_span().as_str());
         }
-        Rule::EOI => { 
-            info!("Rule::EOI at {:?}", pair.line_col());
+        generic::Rule::EOI => { 
+            info!("generic::Rule::EOI at {:?}", pair.line_col());
         }
 
-        Rule::WHITESPACE => {}
-        Rule::acct_descriptor => { dump_pair(&pair); return Ok(()); }
-        Rule::acct_separator => { dump_pair(&pair); return Ok(()); }
-        Rule::balance_directive => { dump_pair(&pair); return Ok(()); }
-        Rule::comment_or_newline => { dump_pair(&pair); return Ok(()); }
-        Rule::comment_token => { dump_pair(&pair); return Ok(()); }
-        Rule::currency => { dump_pair(&pair); return Ok(()); }
-        Rule::decimal_value => { dump_pair(&pair); return Ok(()); }
-        Rule::directive_close => { dump_pair(&pair); return Ok(()); }
-        Rule::directive_commodity => { dump_pair(&pair); return Ok(()); }
-        Rule::directive_open => { dump_pair(&pair); return Ok(()); }
-        Rule::directives => { dump_pair(&pair); return Ok(()); }
-        Rule::empty_line => {}
-        Rule::iso8601_date_extended => { dump_pair(&pair); return Ok(()); }
-        Rule::ledger => { 
+        generic::Rule::WHITESPACE => {}
+        generic::Rule::acct_descriptor => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::acct_separator => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::balance_directive => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::comment_or_newline => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::comment_token => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::currency => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::decimal_value => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::directive_close => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::directive_commodity => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::directive_open => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::directives => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::empty_line => {}
+        generic::Rule::iso8601_date_extended => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::generic_ledger => { 
             return handle_ledger_rule(&pair);
         }
-        Rule::options => { dump_pair(&pair); return Ok(()); }
-        Rule::posting_basic => { dump_pair(&pair); return Ok(()); }
-        Rule::posting_indent => { dump_pair(&pair); return Ok(()); }
-        Rule::sub_acct => { dump_pair(&pair); return Ok(()); }
-        Rule::top_level_acct => { dump_pair(&pair); return Ok(()); }
-        Rule::trans_annotation => { dump_pair(&pair); return Ok(()); }
-        Rule::trans_description => { dump_pair(&pair); return Ok(()); }
-        Rule::trans_description_text => { dump_pair(&pair); return Ok(()); }
-        Rule::trans_header => {
+        generic::Rule::options => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::posting_basic => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::posting_indent => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::sub_acct => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::top_level_acct => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::trans_annotation => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::trans_description => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::trans_description_text => { dump_pair(&pair); return Ok(()); }
+        generic::Rule::trans_header => {
             let mut xn = raw_transaction::RawTransaction::default();
             return handle_trans_header(&mut xn, &pair);
         }
-        Rule::transaction_block => {
+        generic::Rule::transaction_block => {
             let mut xn = raw_transaction::RawTransaction::default();
             return handle_trans_block(&mut xn, &pair);
         }

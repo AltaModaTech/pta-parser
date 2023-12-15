@@ -1,6 +1,12 @@
+// Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+//
+// This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+//
+
 #[cfg(test)] use super::*;
 #[cfg(test)] use rstest::rstest;
 
+// mod generic;
 
 #[cfg(test)]
 mod acct_desc {
@@ -19,8 +25,8 @@ mod acct_desc {
     #[case ("asset:property:real")]
     fn can_parse_acct_descriptor(#[case] acct_desc: &str) {
 
-        let pairs = GenericParser::parse(
-            Rule::acct_descriptor, acct_desc)
+        let pairs = generic::Parser::parse(
+            generic::Rule::acct_descriptor, acct_desc)
             .unwrap_or_else(|e| panic!("{}", e));
 
         // Parsing succeeded; ensure at least 1 pair was returned
@@ -36,8 +42,8 @@ mod acct_desc {
     #[ignore = "unexpectedly parses without error"]
     fn verify_acct_descriptor_parsing_error(#[case] bad_acct_desc: &str) {
 
-        GenericParser::parse(
-            Rule::acct_descriptor, bad_acct_desc)
+        generic::Parser::parse(
+            generic::Rule::acct_descriptor, bad_acct_desc)
             .unwrap_or_else(|e| panic!("{}", e));
 
         // should never reach this code since all cases should result in panic
@@ -55,8 +61,8 @@ mod acct_desc {
     #[should_panic(expected = "expected top_level_acct")]
     fn verify_top_level_acct_parsing_error(#[case] bad_top_level_acct: &str) {
 
-        GenericParser::parse(
-            Rule::top_level_acct, bad_top_level_acct)
+        generic::Parser::parse(
+            generic::Rule::top_level_acct, bad_top_level_acct)
             .unwrap_or_else(|e| panic!("{}", e));
 
         // should never reach this code since all cases should result in panic
@@ -79,8 +85,8 @@ mod decimal {
     #[case ("-0.00000001")]
     fn can_parse_decimal_value(#[case] dec: &str) {
 
-        let pairs = GenericParser::parse(
-            Rule::decimal_value, dec)
+        let pairs = generic::Parser::parse(
+            generic::Rule::decimal_value, dec)
             .unwrap_or_else(|e| panic!("{}", e));
 
         // Parsing succeeded; ensure at least 1 pair was returned
@@ -100,8 +106,8 @@ mod decimal {
     #[should_panic(expected = "expected decimal_value")]
     fn verify_decimal_value_error(#[case] bad_dec: &str) {
 
-        GenericParser::parse(
-            Rule::decimal_value, bad_dec)
+        generic::Parser::parse(
+            generic::Rule::decimal_value, bad_dec)
             .unwrap_or_else(|e| panic!("{}", e));
 
         // should never reach this code since all cases should result in panic
@@ -122,8 +128,8 @@ mod iso8601 {
     #[case ("2015-12-31")]
     fn can_parse_iso8601_date_extended(#[case] year: &str) {
 
-        let pairs = GenericParser::parse(
-            Rule::iso8601_date_extended, year)
+        let pairs = generic::Parser::parse(
+            generic::Rule::iso8601_date_extended, year)
             .unwrap_or_else(|e| panic!("{}", e));
 
         // Parsing succeeded; ensure at least 1 pair was returned
@@ -156,8 +162,8 @@ mod iso8601 {
     #[should_panic(expected = "expected iso8601_")] // matches errors from multiple iso8601 rules
     fn verify_iso8601_date_extended_error(#[case] bad_date: &str) {
 
-        GenericParser::parse(
-            Rule::iso8601_date_extended, bad_date)
+        generic::Parser::parse(
+            generic::Rule::iso8601_date_extended, bad_date)
             .unwrap_or_else(|e| panic!("{}", e));
 
         // should never reach this code since all cases should result in panic
