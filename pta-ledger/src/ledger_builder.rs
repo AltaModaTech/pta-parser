@@ -4,7 +4,7 @@
 //
 
 
-use log::{info, warn, as_error};
+use log::{info, warn};
 
 use pta_types::*;
 
@@ -34,7 +34,7 @@ impl LedgerBuilder {
             }
     
             Err(err) => {
-                warn!(err = as_error!(err); "failed to parse with generic::Rule::generic_ledger");
+                warn!("failed to parse with generic::Rule::generic_ledger. err: {err}");
                 return Err(Box::new(err));
             }
         }
@@ -120,7 +120,7 @@ fn handle_ledger_rule(pair: & Pair<generic::Rule>) -> Result<(), Box<dyn std::er
             Ok(_p) => { /* handle_pair does all the work */ }
 
             Err(err) => {
-                warn!(err = as_error!(*err); "handle_pair failed in handle_ledger");
+                warn!("handle_pair failed in handle_ledger. err: {err}");
                 return Err(err);
             }
         };
@@ -139,7 +139,7 @@ fn handle_posting_basic(_xn: &mut raw_transaction::RawTransaction, pair: &Pair<g
         }
         
         Err(e) => {
-            warn!(err = as_error!(e); "failed to parse with posting_basic");
+            warn!("failed to parse with posting_basic. err: {e}");
             return Err(Box::new(e));
         }
             
@@ -175,7 +175,7 @@ fn handle_trans_block(xn: &mut raw_transaction::RawTransaction, pair: &Pair<gene
                     }
 
                     Err(e) => {
-                        warn!(err = e; "handle_trans_header failed");
+                        warn!("handle_trans_header failed. err: {e}");
                         return Err(e);
                     }
                 }
@@ -187,7 +187,7 @@ fn handle_trans_block(xn: &mut raw_transaction::RawTransaction, pair: &Pair<gene
         }
 
         Err(e) => {
-            warn!(err = as_error!(e); "failed to parse with trans_header");
+            warn!("failed to parse with trans_header. err: {e}");
             return Err(Box::new(e));
         }
     }
