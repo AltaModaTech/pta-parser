@@ -1,0 +1,113 @@
+// Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+//
+// This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+//
+
+
+// Each acct token must begin with alpha and may be followed by any number of alpha or number
+// Full account descriptors are comprised of colon-separated account names. The top-level 
+//  account name must begin with an alpha char, but subaccounts may begin with alphanumeric.
+top_level_acct      = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
+sub_acct            = @{ acct_separator ~ ASCII_ALPHANUMERIC+ }
+
+// The full acct descriptor must be one or more acct tokens, each separated by a colon
+acct_descriptor     = @{ top_level_acct ~ (sub_acct)* }
+
+decimal_value       = @{ (("-" ~ NUMBER+) | NUMBER+) ~ "." ~ NUMBER+ }
+
+
+// TODO: consider more lax indent rules
+// Posting lines of a transaction must begin with 1 tab or 2 spaces
+posting_indent      = _{ "\t" | " "{2} }
+// A basic posting must specify an account and a value, ending with a comment or newline
+posting_basic       = @{
+    posting_indent 
+    ~ acct_descriptor
+    ~ WHITESPACE+ ~ decimal_value
+    ~ comment_or_newline
+}
+
+// TODO: improve on 'text' to allow more in description
+trans_description_text = _{ (ASCII_ALPHANUMERIC+ | WHITESPACE)+ }
+// TODO: is this the full set of annotation options?
+trans_annotation    = _{ "txn" | "*" | "!" }
+trans_description   = _{ "\"" ~ trans_description_text ~ "\"" }
+
+// TODO: how to ensure col 0 / no ws for header row
+// The header of a transaction specifies the date, an annotation, a description, and ends with a comment or newline
+trans_header = @{
+    iso8601_date_extended
+    ~ WHITESPACE+
+    ~ trans_annotation
+    ~ WHITESPACE+
+    ~ trans_description
+    ~ comment_or_newline
+}
+
+// A transaction begins with a single header followed by one or more postings. Whether the transaction balances is 
+//  outside the scope of parsing.
+transaction_block   = @{ trans_header ~ posting_basic+ }
+
+
+options             = { "operating_currency" }
+
+// TODO: open works but is incomplete
+// YYYY-MM-DD open Account [ConstraintCurrency,...] ["BookingMethod"]
+directive_open  = @{
+    iso8601_date_extended
+    ~ WHITESPACE+ ~ "open"
+    ~ WHITESPACE+ ~ acct_descriptor
+    ~ comment_or_newline
+}
+// YYYY-MM-DD close Account
+directive_close = @{
+    iso8601_date_extended
+    ~ WHITESPACE+ ~ "close"
+    ~ WHITESPACE+ ~ acct_descriptor
+    ~ comment_or_newline
+}
+// YYYY-MM-DD commodity Currency
+directive_commodity = @{
+    iso8601_date_extended
+    ~ WHITESPACE+ ~ "commodity"
+    ~ WHITESPACE+ ~ currency
+    ~ comment_or_newline
+}
+// YYYY-MM-DD balance Account Amount
+balance_directive = @{
+    iso8601_date_extended
+    ~ WHITESPACE+ ~ "balance"
+    ~ WHITESPACE+ ~ acct_descriptor
+    ~ WHITESPACE+ ~ decimal_value
+    ~ WHITESPACE+ ~ currency
+    ~ comment_or_newline
+}
+
+// TODO: other directives to implement
+// YYYY-MM-DD document Account PathToDocument
+// YYYY-MM-DD event Name Value
+// YYYY-MM-DD note Account Description
+// YYYY-MM-DD pad Account AccountPad
+// YYYY-MM-DD price Commodity Price
+// include Filename
+// option Name Value
+// plugin ModuleName StringConfig
+// poptag
+// pushtag
+
+directives = { balance_directive | directive_close | directive_commodity | directive_open }
+
+// The rule for a complete ledger
+generic_ledger = { SOI ~ (options | directives | transaction_block | comment | empty_line)+ ~ EOI }
+
+
+//
+//  Pest's built-in rules:
+//      ASCII_ALPHA_LOWER   = { 'a'..'z' }
+//      ASCII_ALPHA_UPPER   = { 'A'..'Z' }
+//      ASCII_ALPHA         = { ASCII_ALPHA_LOWER | ASCII_ALPHA_UPPER }
+//      ASCII_DIGIT         = { '0'..'9' }
+//      ASCII_ALPHANUMERIC  = { ASCII_ALPHA | ASCII-DIGIT }
+//      
+//      Avoid using WHITE_SPACE which targets [unicode](https://www.unicode.org/reports/tr31/#R3a)
+//

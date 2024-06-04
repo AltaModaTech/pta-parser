@@ -1,0 +1,23 @@
+# Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+#
+# This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+
+[package]
+name = "pta-types"
+version.workspace = true
+authors.workspace = true
+# respository.workspace = true
+edition.workspace = true
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+bench = false
+
+[dependencies]
+log = "0.4.20"
+pest = "2.7.3"
+pest_derive = "2.7.3"
+
+[dev-dependencies]
+rstest = "0.19.0"

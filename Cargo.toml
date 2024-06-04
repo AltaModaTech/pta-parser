@@ -1,0 +1,19 @@
+# Copyright (C) 2023, AltaModa Technologies, LLC. All rights reserved.
+#
+# This project is licensed under the terms of the MIT license (cf. LICENSE file in root).
+
+[workspace]
+resolver = "2"
+members = [
+    "cli"
+    ,"pta-ledger"
+    ,"pta-parser"
+    ,'pta-types',
+]
+
+# Default values for workspace projects
+[workspace.package]
+edition = "2021"
+version = "0.2.0"
+authors = ["AltaModa Technologies"]
+# respository = "https://github.com/altamodatech/pta-parser"
