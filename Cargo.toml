@@ -16,4 +16,4 @@ members = [
 edition = "2021"
 version = "0.2.0"
 authors = ["AltaModa Technologies"]
-respository = "https://github.com/altamodatech/pta-parser"
+# respository = "https://github.com/altamodatech/pta-parser"

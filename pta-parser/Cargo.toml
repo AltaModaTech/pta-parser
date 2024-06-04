@@ -6,7 +6,7 @@
 name = "pta-parser"
 version.workspace = true
 authors.workspace = true
-respository.workspace = true
+# respository.workspace = true
 edition.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

@@ -6,7 +6,7 @@
 name = "cli"
 version.workspace = true
 authors.workspace = true
-respository.workspace = true
+# respository.workspace = true
 edition.workspace = true
 
 
