@@ -7,7 +7,7 @@ extern crate pta_ledger;
 extern crate pta_parser;
 
 
-use log::{info, warn, as_error, error};
+use log::{info, warn, error};
 
 // TODO: how to isolate pest so clients can just use lib (w/o requiring pest as here)
 use pta_ledger::ledger_builder::LedgerBuilder;
@@ -45,7 +45,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         Err(e) => {
-            warn!(err = as_error!(e); "failed to read file as string");
+            warn!("failed to read file as string; {e}");
             return Err(Box::new(e));
         }
     }
